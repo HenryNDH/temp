@@ -1,5 +1,5 @@
 const express = require('express');
-
+const { createSuccessResponse } = require('../../src/response');
 // Version and author from package.json
 const { version, author } = require('../../package.json');
 
@@ -30,6 +30,10 @@ router.get('/', (req, res) => {
     githubUrl: 'https://github.com/HenryNDH/fragments',
     version,
   });
+});
+
+router.get('/health', (req, res) => {
+  res.json(createSuccessResponse());
 });
 
 module.exports = router;
