@@ -40,8 +40,8 @@ class Fragment {
     this.ownerId = ownerId; // Assign the passed id
     this.created = created || new Date().toISOString(); // Default to current date if not provided
     this.updated = updated || this.created; // Default to created date if updated is not provided
-    this.type = type; //Assign type
-    this.size = size; //Assign size
+    this.type = type; // Assign type
+    this.size = size; // Assign size
 
     logger.info(`Fragment created with ID: ${this.id}, type: ${this.type}, size: ${this.size}`); // Not logging the user ID for security
     logger.debug(`Fragment details: ${JSON.stringify(this)}`);
@@ -154,8 +154,13 @@ class Fragment {
    * @returns {string} fragment's mime type (without encoding)
    */
   get mimeType() {
-    const { type } = contentType.parse(this.type);
-    return type;
+    try {
+      const { type } = contentType.parse(this.type);
+      return type;
+    } catch (error) {
+      logger.error(`Failed to parse MIME type: ${this.type}, Error: ${error.message}`);
+      throw new Error(`Invalid MIME type: ${this.type}`);
+    }
   }
 
   /**
@@ -174,6 +179,7 @@ class Fragment {
     // Supported content type to be added more next labs/assignments
     const supportedFormats = {
       'text/plain': ['text/plain'],
+      // Add other conversions here
     };
     // Return types or empty array
     return supportedFormats[this.mimeType] || [];
@@ -181,19 +187,17 @@ class Fragment {
 
   /**
    * Returns true if we know how to work with this content type
-   * @param {string} value a Content-Type value (e.g., 'text/plain' or 'var contentType = require('content-type')')
+   * @param {string} value a Content-Type value (e.g., 'text/plain' or 'application/json')
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    // Supported content type to be added more next labs/assignments
     const supportedTypes = {
       'text/plain': ['text/plain'],
+      'application/json': ['application/json'],
+      // Add more supported types as needed
     };
 
-    // Extract the MIME type from the value
     const { type } = contentType.parse(value);
-
-    // Check if the extracted MIME type exists in the supportedTypes object
     return Object.keys(supportedTypes).includes(type);
   }
 }
